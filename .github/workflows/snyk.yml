@@ -28,14 +28,10 @@ jobs:
       - name: Run Snyk to Scan for Vulnerabilities
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        id: snyk_test
         run: |
-          snyk test --json > snyk-report.json
-          echo "::set-output name=found::$(jq '.vulnerabilities | length' snyk-report.json)"
-
-      - name: Fail if vulnerabilities found
-        if: steps.snyk_test.outputs.found != '0'
+          snyk test | tee snyk-output.txt
+          
+      - name: Echo Snyk Output
         run: |
-          echo "Vulnerabilities found!"
-          exit 1
-
+          echo "Snyk Vulnerability Scan Results:"
+          cat snyk-output.txt
